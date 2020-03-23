@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-
+use App\Http\Requests\LoginRequest;
 class AuthController extends Controller
 {
     /**
@@ -22,8 +22,9 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login()
+    public function login(LoginRequest $request)
     {
+     
         $credentials = request(['email', 'password']);
 
         if (! $token = auth()->attempt($credentials)) {
@@ -50,6 +51,7 @@ class AuthController extends Controller
      */
     public function logout()
     {
+        \Log::info("LOGOUT");
         auth()->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
