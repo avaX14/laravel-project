@@ -13,9 +13,14 @@ class MovieController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($title=null)
     {
+        if($title){
+            return Movie::where('title', 'like', "%{$title}%")->paginate(5);
+        }else{
         return Movie::paginate(5);
+    }
+
     }
 
     /**
@@ -39,6 +44,7 @@ class MovieController extends Controller
     {
         return Movie::find($id);
     }
+
 
     /**
      * Update the specified resource in storage.
