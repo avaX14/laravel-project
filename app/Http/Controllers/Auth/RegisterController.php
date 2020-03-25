@@ -8,6 +8,7 @@ use App\Http\Requests\RegistrationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
@@ -40,7 +41,7 @@ class RegisterController extends Controller
     {
         $this->middleware('guest');
     }
- 
+
 
     /**
      * Create a new user instance after a valid registration.
