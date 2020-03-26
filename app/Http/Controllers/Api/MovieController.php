@@ -20,10 +20,20 @@ class MovieController extends Controller
     public function index($title=null)
     {
         if($title){
-            return Movie::where('title', 'like', "%{$title}%")->paginate(5);
+            $movies =  Movie::with('likes')->where('title', 'like', "%{$title}%")->paginate(5);
+            $movies->each(function ($item, $key) {
+                $this->generateLikes($item);
+                
+            });
+            return $movies;
         }
 
-        return Movie::paginate(5);
+        $movies =  Movie::with('likes')->paginate(5);
+        $movies->each(function ($item, $key) {
+            $this->generateLikes($item);
+            
+        });
+        return $movies;
 
     }
 
@@ -84,14 +94,16 @@ class MovieController extends Controller
             ['liked' => ($like==1), 'disliked'=> ($like==0) ]
         );
 
-        $allLikes = LikeDislike::where(['movie_id' => $movieId, 'liked' => 1])->get();
-        $allDislikes = LikeDislike::where(['movie_id' => $movieId, 'disliked' => 1])->get();
+        $movieToUpdate =  Movie::with('likes')->find($movieId);
+        return $this->generateLikes($movieToUpdate);
 
-        $movieToUpdate =  Movie::find($movieId);
-        $movieToUpdate->likes = count($allLikes);
-        $movieToUpdate->dislikes = count($allDislikes);
-        $movieToUpdate->save();
+    }
 
+    public function generateLikes($movieToUpdate){
+        $allLikes = count($movieToUpdate->likes->where('liked', 1));
+        $allDislikes = count($movieToUpdate->likes->where('disliked', 1));
+        $movieToUpdate['likesNumber'] = $allLikes;
+        $movieToUpdate['dislikesNumber'] = $allDislikes;
         return $movieToUpdate;
 
     }
