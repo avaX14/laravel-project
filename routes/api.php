@@ -26,3 +26,4 @@ Route::group([
 
 Route::get('movies/{title?}', 'Api\MovieController@index');
 Route::get('movie/{id}', 'Api\MovieController@show');
+Route::get('genres', 'Api\GenreController');
