@@ -15,7 +15,6 @@ class AlterMoviesTableAddGenreIdField extends Migration
     {
         Schema::table('movies', function (Blueprint $table) {
             $table->integer('genre_id')->unsigned()->nullable();
-
             $table->foreign('genre_id')
                 ->references('id')
                 ->on('genres')
