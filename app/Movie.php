@@ -14,5 +14,9 @@ class Movie extends Model
         return $this->hasMany('App\LikeDislike');
     }
 
+    public function genres()
+    {
+        return $this->belongsToMany('App\Genre');
+    }
 
 }

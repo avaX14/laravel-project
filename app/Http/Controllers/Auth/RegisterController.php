@@ -51,7 +51,6 @@ class RegisterController extends Controller
      */
     protected function create(RegistrationRequest $request)
     {
-
         $request = $request->validated();
 
         return User::create([
