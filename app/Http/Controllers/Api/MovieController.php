@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Movie;
+use App\Genre;
 use App\LikeDislike;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 class MovieController extends Controller
 {
@@ -17,22 +19,30 @@ class MovieController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index($title=null)
+    public function index($title, $genre)
     {
-        if($title){
-            $movies =  Movie::with('likes')->where('title', 'like', "%{$title}%")->paginate(5);
+
+        if($title!="false"){
+            $movies =  Movie::with('likes')->with('genres')->where('title', 'like', "%{$title}%")->paginate(5);
             $movies->each(function ($item, $key) {
                 $this->generateLikes($item);
-                
             });
+            
             return $movies;
         }
+        else if($genre != "false"){  
+            $genres = Genre::with('movies')->where('name', '=', $genre)->first();
+            $movies = $genres->movies()->paginate(5);
 
-        $movies =  Movie::with('likes')->paginate(5);
+            return $movies;
+
+        }
+        $movies =  Movie::with('likes')->with('genres')->paginate(5);
         $movies->each(function ($item, $key) {
             $this->generateLikes($item);
             
         });
+        
         return $movies;
 
     }
@@ -57,8 +67,9 @@ class MovieController extends Controller
      */
     public function show($id)
     {
-        $movie = Movie::find($id);
+        $movie = Movie::with('genres')->find($id);
         $movie->increment('visited');
+        $this->generateLikes($movie);
         return $movie;
     }
 

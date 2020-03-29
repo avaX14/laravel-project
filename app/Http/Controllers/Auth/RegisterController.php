@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\RegistrationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Str;
 
@@ -52,7 +51,6 @@ class RegisterController extends Controller
      */
     protected function create(RegistrationRequest $request)
     {
-        \Log::info($request);
         $request = $request->validated();
 
         return User::create([
