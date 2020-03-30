@@ -6,7 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Comment extends Model
 {
-    public function movies(){
+    public function movie(){
         return $this->belongsTo('App\Movie');
+    }
+
+    public function user(){
+        return $this->belongsTo('App\User');
     }
 }
