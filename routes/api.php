@@ -29,4 +29,5 @@ Route::get('movie/{id}', 'Api\MovieController@show');
 Route::get('genres', 'Api\GenreController');
 Route::post('like/{movieId}', 'Api\MovieController@likeDislikeMovie');
 
+Route::get('comments/{movieId}', 'Api\CommentController@index');
 Route::post('comments/{movieId}','Api\CommentController@store');

@@ -19,7 +19,7 @@ class Movie extends Model
         return $this->belongsToMany('App\Genre');
     }
 
-    public function movies(){
+    public function comments(){
         return $this->hasMany('App\Comment');
     }
 

@@ -14,9 +14,10 @@ class CommentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index($movieId)
     {
-        //
+        $comments = Comment::where('movie_id', '=', $movieId)->paginate(2);
+        return $comments;
     }
 
     /**
@@ -38,13 +39,18 @@ class CommentController extends Controller
     public function store(Request $request, $movieId)
     {
         $userId= auth()->user()["id"];
+        $userName = auth()->user()["name"];
 
         $comment = new Comment;
         $comment->user_id = $userId;
         $comment->movie_id = $movieId;
         $comment->text = $request->text;
+        $comment->user_name= $userName;
 
         $comment->save();
+
+        // Comment::with('user')->where('movie_id', '=', $movieId)->paginate(2);
+        return $comment;
     }
 
     /**

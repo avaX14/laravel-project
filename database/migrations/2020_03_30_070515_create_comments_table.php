@@ -18,6 +18,7 @@ class CreateCommentsTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->integer('movie_id')->unsigned();
             $table->string('text');
+            $table->string('user_name');
             $table->timestamps();
 
             $table->foreign('movie_id')->references('id')->on('movies');
