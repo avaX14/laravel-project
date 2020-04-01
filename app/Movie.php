@@ -23,4 +23,8 @@ class Movie extends Model
         return $this->hasMany('App\Comment');
     }
 
+    public function users(){
+        return $this->belongsToMany('App\User', 'watch_lists', 'movie_id','user_id');
+    }
+
 }

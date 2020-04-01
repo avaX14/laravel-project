@@ -57,4 +57,8 @@ class User extends Authenticatable implements JWTSubject
     public function comments(){
         return $this->hasMany('App\Comment');
     }
+
+    public function movies(){
+        return $this->belongsToMany('App\Movie', 'watch_lists')->withPivot('watched');
+    }
 }
