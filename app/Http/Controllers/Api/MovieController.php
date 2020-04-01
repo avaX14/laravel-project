@@ -170,4 +170,11 @@ class MovieController extends Controller
     public function getLoggedInUserId(){
         return auth()->user()["id"];
     }
+
+    public function getPopularMovies(){
+        $movies =  Movie::get()->sortByDesc('visited')->values()->take(10);
+        \Log::info($movies);
+        return $movies;
+        
+    }
 }

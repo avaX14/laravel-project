@@ -28,6 +28,8 @@ Route::get('movies/{title}/{genre}', 'Api\MovieController@index');
 Route::get('movies/watchList', 'Api\MovieController@watchList');
 Route::get('movie/{id}', 'Api\MovieController@show');
 Route::get('genres', 'Api\GenreController');
+Route::get('movies/popularMovies', 'Api\MovieController@getPopularMovies');
+
 Route::post('like/{movieId}', 'Api\MovieController@likeDislikeMovie');
 Route::post('movies/addToWatchList/{movieId}', 'Api\MovieController@addToWatchList');
 Route::post('movies/removeFromWatchList/{movieId}', 'Api\MovieController@removeFromWatchList');
