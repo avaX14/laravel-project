@@ -9,6 +9,8 @@ class Movie extends Model
 {
     //
 
+    protected $fillable = array('title', 'description', 'image_url');
+
     public function likes()
     {
         return $this->hasMany('App\LikeDislike');
