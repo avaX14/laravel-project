@@ -78,6 +78,7 @@ class MovieController extends Controller
     {
         $movie = Movie::with('genres')->find($id);
         $movie->increment('visited');
+        $movie['watched'] = false;
         $this->generateLikes($movie);
         
         return $movie;
