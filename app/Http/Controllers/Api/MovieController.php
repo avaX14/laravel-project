@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Movie;
 use App\Genre;
 use App\LikeDislike;
+use App\WatchList;
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -70,6 +72,7 @@ class MovieController extends Controller
         $movie = Movie::with('genres')->find($id);
         $movie->increment('visited');
         $this->generateLikes($movie);
+        
         return $movie;
     }
 
@@ -100,7 +103,7 @@ class MovieController extends Controller
     public function likeDislikeMovie(Request $request, $movieId){
         
         $like = $request['like'];
-        $userId= auth()->user()["id"];
+        $userId = $this->getLoggedInUserId();
 
         $likeDislike = LikeDislike::updateOrCreate(
             ['user_id' => $userId, 'movie_id' => $movieId],
@@ -119,5 +122,44 @@ class MovieController extends Controller
         $movieToUpdate['dislikesNumber'] = $allDislikes;
         return $movieToUpdate;
 
+    }
+
+    public function watchList(){
+        $userId = $this->getLoggedInUserId();
+        $userMovies =  User::with('movies')->where('id', '=', $userId)->first();
+        $userMovies->movies->each(function ($item, $key) {
+                $item['watched'] = $item->pivot->watched;
+                $this->generateLikes($item);
+        });
+
+        return $userMovies;
+    }
+
+    public function addToWatchList($movieId){
+        $userId = $this->getLoggedInUserId();
+        $user = User::find($userId);
+        $user->movies()->attach($movieId);
+    }
+
+    public function removeFromWatchList($movieId){
+        $userId = $this->getLoggedInUserId();
+        $user = User::find($userId);
+        $user->movies()->detach($movieId);
+    }
+
+    public function markMovieAsWatched($movieId){
+        $userId = $this->getLoggedInUserId();
+        $userMovies =  User::with('movies')->where('id', '=', $userId)->first();
+        $userMovies->movies->each(function ($item, $key) use($movieId){
+            if($item->id==$movieId){
+                $item->pivot->watched = !($item->pivot->watched);
+                $item->pivot->save();
+            }
+        });
+        return $userMovies;
+    }
+
+    public function getLoggedInUserId(){
+        return auth()->user()["id"];
     }
 }

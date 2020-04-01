@@ -12,7 +12,6 @@ class CommentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
      */
     public function index($movieId)
     {
@@ -46,10 +45,8 @@ class CommentController extends Controller
         $comment->movie_id = $movieId;
         $comment->text = $request->text;
         $comment->user_name= $userName;
-
         $comment->save();
 
-        // Comment::with('user')->where('movie_id', '=', $movieId)->paginate(2);
         return $comment;
     }
 
