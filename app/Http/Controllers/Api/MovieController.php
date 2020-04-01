@@ -11,6 +11,7 @@ use App\WatchList;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Requests\CreateMovieRequest;
 
 class MovieController extends Controller
 {
@@ -56,9 +57,15 @@ class MovieController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CreateMovieRequest $request)
     {
-        //
+        $request = $request->validated();
+
+        return Movie::create([
+            'title' => request('title'),
+            'image_url' => request('image'),
+            'description' => request('description')
+        ]);
     }
 
     /**
@@ -71,6 +78,7 @@ class MovieController extends Controller
     {
         $movie = Movie::with('genres')->find($id);
         $movie->increment('visited');
+        $movie['watched'] = false;
         $this->generateLikes($movie);
         
         return $movie;
