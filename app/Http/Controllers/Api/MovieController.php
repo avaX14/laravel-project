@@ -173,8 +173,17 @@ class MovieController extends Controller
 
     public function getPopularMovies(){
         $movies =  Movie::get()->sortByDesc('visited')->values()->take(10);
-        \Log::info($movies);
         return $movies;
-        
+    }
+
+    public function getRelatedMovies(Request $request){
+        $movies=collect([]);
+        $genre  = Genre::with('movies')->whereIn('id', $request)->take(10)->get();
+        $genre->each(function ($item, $key)use($movies){
+            $item->movies->each(function ($item, $key)use($movies) {
+                $movies->push($item);
+            });
+        });
+        return $movies->unique('id');
     }
 }
