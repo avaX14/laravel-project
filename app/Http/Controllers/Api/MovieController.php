@@ -9,6 +9,8 @@ use App\Genre;
 use App\LikeDislike;
 use App\WatchList;
 use App\User;
+use App\Mail\MovieCreated;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\CreateMovieRequest;
@@ -60,12 +62,13 @@ class MovieController extends Controller
     public function store(CreateMovieRequest $request)
     {
         $request = $request->validated();
-
-        return Movie::create([
+        $movie =  Movie::create([
             'title' => request('title'),
             'image_url' => request('image'),
             'description' => request('description')
         ]);
+        Mail::to('test@test.com')->send(new MovieCreated($movie));
+
     }
 
     /**
@@ -111,7 +114,7 @@ class MovieController extends Controller
     public function likeDislikeMovie(Request $request, $movieId){
         
         $like = $request['like'];
-        $userId = $this->getLoggedInUserId();
+        $userId = $request->user()->id;
 
         $likeDislike = LikeDislike::updateOrCreate(
             ['user_id' => $userId, 'movie_id' => $movieId],
@@ -133,7 +136,7 @@ class MovieController extends Controller
     }
 
     public function watchList(){
-        $userId = $this->getLoggedInUserId();
+        $userId = $request->user()->id;
         $userMovies =  User::with('movies')->where('id', '=', $userId)->first();
         $userMovies->movies->each(function ($item, $key) {
                 $item['watched'] = $item->pivot->watched;
@@ -144,19 +147,19 @@ class MovieController extends Controller
     }
 
     public function addToWatchList($movieId){
-        $userId = $this->getLoggedInUserId();
+        $userId = $request->user()->id;
         $user = User::find($userId);
         $user->movies()->attach($movieId);
     }
 
     public function removeFromWatchList($movieId){
-        $userId = $this->getLoggedInUserId();
+        $userId = $request->user()->id;
         $user = User::find($userId);
         $user->movies()->detach($movieId);
     }
 
     public function markMovieAsWatched($movieId){
-        $userId = $this->getLoggedInUserId();
+        $userId = $request->user()->id;
         $userMovies =  User::with('movies')->where('id', '=', $userId)->first();
         $userMovies->movies->each(function ($item, $key) use($movieId){
             if($item->id==$movieId){
@@ -165,10 +168,6 @@ class MovieController extends Controller
             }
         });
         return $userMovies;
-    }
-
-    public function getLoggedInUserId(){
-        return auth()->user()["id"];
     }
 
     public function getPopularMovies(){
