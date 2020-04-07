@@ -59,24 +59,17 @@ class MovieController extends Controller
      */
     public function store(CreateMovieRequest $request)
     {
-        \Log::info($request->image);
-        // $request = $request->validated();
+        \Log::info($request);
 
-        // if($request->hasFile('image')){
-            $movie=  Movie::create([
-                'title' => request('title'),
-                'image_url' => '',
-                'description' => request('description')
-            ]);
-        // }else{
-        //     $movie=  Movie::create([
-        //         'title' => request('title'),
-        //         'image_url' => request('imageUrl'),
-        //         'description' => request('description')
-        //     ]);
-        // }
+        $movie=  Movie::create([
+            'title' => request('title'),
+            'image_url' => request('imageURL'),
+            'description' => request('description')
+        ]);
 
-        $this->storeImage($movie->id, $request);
+        \Log::info($movie);
+      
+
     }
 
     /**
@@ -198,23 +191,20 @@ class MovieController extends Controller
         return $movies->unique('id');
     }
 
-    public function storeImage($movieId, $request){
-        // $request->image->validate([
-        //     'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        // ]);
-        $image = $request->image->file('image');
-        $thumbnail = $movieId.'_image200x200'.time().'.'.$image->getClientOriginalExtension();
-        $thumbnail->resize(200, 200);
-        $fullSize = $movieId.'_image400x400'.time().'.'.$rimage->getClientOriginalExtension();
-        $fullSize->resize(400, 400);
+    public function storeImage(Request $request){
+        
+        if($request->has('image')){
+            $image       = $request->file('image');
+            $filename    = $image->getClientOriginalName();
 
-        $image->storeAs('movieImages', $thumbnail);
-        $image->storeAs('movieImages', $fullSize);
+            $thumbnail = Image::make($image->getRealPath())->fit(200,200);              
+            $thumbnail->save(public_path('storage/images'.'thumbnail_' .$filename));
 
-        $movieImage = new MovieImage();
-        $movieImage->movie_id = $movieId;
-        $movieImage->thumbnail = $thumbnail;
-        $movieImage->full_size = $fullSize;
+            $full_size = Image::make($image->getRealPath())->fit(200,200);              
+            $full_size->save(public_path('storage/images'.'full_size_' .$filename));
+
+            return $filename;
+        }
 
     }
 }
