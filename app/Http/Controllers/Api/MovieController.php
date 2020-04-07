@@ -59,13 +59,24 @@ class MovieController extends Controller
      */
     public function store(CreateMovieRequest $request)
     {
-        $request = $request->validated();
+        \Log::info($request->image);
+        // $request = $request->validated();
 
-        return Movie::create([
-            'title' => request('title'),
-            'image_url' => request('image'),
-            'description' => request('description')
-        ]);
+        // if($request->hasFile('image')){
+            $movie=  Movie::create([
+                'title' => request('title'),
+                'image_url' => '',
+                'description' => request('description')
+            ]);
+        // }else{
+        //     $movie=  Movie::create([
+        //         'title' => request('title'),
+        //         'image_url' => request('imageUrl'),
+        //         'description' => request('description')
+        //     ]);
+        // }
+
+        $this->storeImage($movie->id, $request);
     }
 
     /**
@@ -185,5 +196,25 @@ class MovieController extends Controller
             });
         });
         return $movies->unique('id');
+    }
+
+    public function storeImage($movieId, $request){
+        // $request->image->validate([
+        //     'avatar' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        // ]);
+        $image = $request->image->file('image');
+        $thumbnail = $movieId.'_image200x200'.time().'.'.$image->getClientOriginalExtension();
+        $thumbnail->resize(200, 200);
+        $fullSize = $movieId.'_image400x400'.time().'.'.$rimage->getClientOriginalExtension();
+        $fullSize->resize(400, 400);
+
+        $image->storeAs('movieImages', $thumbnail);
+        $image->storeAs('movieImages', $fullSize);
+
+        $movieImage = new MovieImage();
+        $movieImage->movie_id = $movieId;
+        $movieImage->thumbnail = $thumbnail;
+        $movieImage->full_size = $fullSize;
+
     }
 }

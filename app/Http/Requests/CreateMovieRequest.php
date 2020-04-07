@@ -25,7 +25,6 @@ class CreateMovieRequest extends FormRequest
     {
         return [
             'title' => 'bail | required | string | max:30',
-            'image' => 'bail | required | string|max:300',
             'description' => 'bail | required|string|max:500',
         ];
     }

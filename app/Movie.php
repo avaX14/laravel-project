@@ -29,4 +29,9 @@ class Movie extends Model
         return $this->belongsToMany('App\User', 'watch_lists', 'movie_id','user_id');
     }
 
+    public function images()
+    {
+        return $this->hasOne('App\LikeDislike', 'movie_image');
+    }
+
 }

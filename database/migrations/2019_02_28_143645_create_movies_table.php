@@ -17,7 +17,7 @@ class CreateMoviesTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->text('description');
-            $table->string('image_url');
+            $table->string('image_url')->default(null);
             $table->bigInteger('visited')->default(0);
             $table->timestamps();
         });
