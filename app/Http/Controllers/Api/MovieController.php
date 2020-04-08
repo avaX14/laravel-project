@@ -63,9 +63,6 @@ class MovieController extends Controller
      */
     public function store(Request $request)
     {
-
-        
-        $request = $request->validated();
         $movie =  Movie::create([
             'title' => request('title'),
             'image_url' => request('imageURL'),
@@ -85,6 +82,8 @@ class MovieController extends Controller
                 'full_size' => $full_size
             ]);
         }
+
+        $movie['image'] = $fileName;
         Mail::to('test@test.com')->send(new MovieCreated($movie));
 
     }
@@ -153,7 +152,7 @@ class MovieController extends Controller
 
     }
 
-    public function watchList(){
+    public function watchList(Request $request){
         $userId = $request->user()->id;
         $userMovies =  User::with('movies')->where('id', '=', $userId)->first();
         $userMovies->movies->each(function ($item, $key) {
@@ -164,19 +163,19 @@ class MovieController extends Controller
         return $userMovies;
     }
 
-    public function addToWatchList($movieId){
+    public function addToWatchList(Request $request, $movieId){
         $userId = $request->user()->id;
         $user = User::find($userId);
         $user->movies()->attach($movieId);
     }
 
-    public function removeFromWatchList($movieId){
+    public function removeFromWatchList(Request $request, $movieId){
         $userId = $request->user()->id;
         $user = User::find($userId);
         $user->movies()->detach($movieId);
     }
 
-    public function markMovieAsWatched($movieId){
+    public function markMovieAsWatched(Request $request, $movieId){
         $userId = $request->user()->id;
         $userMovies =  User::with('movies')->where('id', '=', $userId)->first();
         $userMovies->movies->each(function ($item, $key) use($movieId){
