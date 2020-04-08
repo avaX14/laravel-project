@@ -31,7 +31,7 @@ class Movie extends Model
 
     public function images()
     {
-        return $this->hasOne('App\LikeDislike', 'movie_image');
+        return $this->hasOne('App\MovieImage');
     }
 
 }

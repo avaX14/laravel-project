@@ -13,7 +13,7 @@ class CreateMovieImageTable extends Migration
      */
     public function up()
     {
-        Schema::create('movie_image', function (Blueprint $table) {
+        Schema::create('movie_images', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('movie_id')->unsigned();
             $table->string('thumbnail');
@@ -32,6 +32,6 @@ class CreateMovieImageTable extends Migration
     public function down()
     {
         Schema::dropForeign(['movie_id']);
-        Schema::dropIfExists('movie_image');
+        Schema::dropIfExists('movie_images');
     }
 }
