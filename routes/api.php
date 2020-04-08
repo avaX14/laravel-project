@@ -37,6 +37,7 @@ Route::post('movies/addToWatchList/{movieId}', 'Api\MovieController@addToWatchLi
 Route::post('movies/removeFromWatchList/{movieId}', 'Api\MovieController@removeFromWatchList');
 Route::post('movies/markAsWatched/{movieId}', 'Api\MovieController@markMovieAsWatched');
 Route::post('movies/createMovie', 'Api\MovieController@store');
+Route::post('movies/uploadImage', 'Api\MovieController@storeImage');
 
 Route::get('comments/{movieId}', 'Api\CommentController@index');
 Route::post('comments/{movieId}','Api\CommentController@store');

@@ -9,9 +9,11 @@ use App\Genre;
 use App\LikeDislike;
 use App\WatchList;
 use App\User;
+use App\MovieImage;
 use App\Mail\MovieCreated;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
+use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\CreateMovieRequest;
 
@@ -28,7 +30,7 @@ class MovieController extends Controller
     {
 
         if($title!="false"){
-            $movies =  Movie::with('likes')->with('genres')->where('title', 'like', "%{$title}%")->paginate(5);
+            $movies =  Movie::with('likes')->with('images')->with('genres')->where('title', 'like', "%{$title}%")->paginate(5);
             $movies->each(function ($item, $key) {
                 $this->generateLikes($item);
             });
@@ -36,13 +38,13 @@ class MovieController extends Controller
             return $movies;
         }
         else if($genre != "false"){  
-            $genres = Genre::with('movies')->where('name', '=', $genre)->first();
+            $genres = Genre::with('movies')->with('images')->where('name', '=', $genre)->first();
             $movies = $genres->movies()->paginate(5);
 
             return $movies;
 
         }
-        $movies =  Movie::with('likes')->with('genres')->paginate(5);
+        $movies =  Movie::with('likes', 'images')->with('genres')->paginate(5);
         $movies->each(function ($item, $key) {
             $this->generateLikes($item);
             
@@ -59,14 +61,30 @@ class MovieController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(CreateMovieRequest $request)
+    public function store(Request $request)
     {
+
+        
         $request = $request->validated();
         $movie =  Movie::create([
             'title' => request('title'),
-            'image_url' => request('image'),
+            'image_url' => request('imageURL'),
             'description' => request('description')
         ]);
+
+        $fileName = $request['fileName'];
+
+        if($fileName){
+    
+            $thumbnail = 'storage/'.'thumbnail_'.$fileName;
+            $full_size = 'storage/'.'full_size_'.$fileName;
+    
+            $movieImage = MovieImage::create([
+                'movie_id' => $movie->id,
+                'thumbnail' => $thumbnail,
+                'full_size' => $full_size
+            ]);
+        }
         Mail::to('test@test.com')->send(new MovieCreated($movie));
 
     }
@@ -79,7 +97,7 @@ class MovieController extends Controller
      */
     public function show($id)
     {
-        $movie = Movie::with('genres')->find($id);
+        $movie = Movie::with('genres', 'images')->find($id);
         $movie->increment('visited');
         $movie['watched'] = false;
         $this->generateLikes($movie);
@@ -184,5 +202,20 @@ class MovieController extends Controller
             });
         });
         return $movies->unique('id');
+    }
+
+    public function storeImage(Request $request){
+        if($request->has('image')){
+            $image       = $request->file('image');
+            $filename    = $image->getClientOriginalName();
+
+            $thumbnail = Image::make($image->getRealPath())->fit(200,200);              
+            $thumbnail->save(public_path('storage/'.'thumbnail_' .$filename));
+
+            $full_size = Image::make($image->getRealPath())->fit(400,400);              
+            $full_size->save(public_path('storage/'.'full_size_' .$filename));
+
+            return $filename;
+        }
     }
 }
