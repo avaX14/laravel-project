@@ -15,15 +15,19 @@ class NewMovieIsCreatedEvent
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $movie;
+    public $fileName;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($movie)
+    public function __construct($movie, $fileName)
     {
+
         $this->movie = $movie;
+        $this->fileName = $fileName;
+
     }
 
 }

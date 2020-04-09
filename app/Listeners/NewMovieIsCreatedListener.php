@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Mail;
 
 
 
-class NewMovieIsCreatedListener
+class NewMovieIsCreatedListener implements ShouldQueue
 {
     
 
@@ -22,7 +22,6 @@ class NewMovieIsCreatedListener
      */
     public function handle(NewMovieIsCreatedEvent $event)
     {
-        Mail::to('test@test.com')->send(new MovieCreated($event->movie));
-        
+        Mail::to('test@test.com')->send(new MovieCreated($event->movie, $event->fileName));
     }
 }

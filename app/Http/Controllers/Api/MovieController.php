@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\CreateMovieRequest;
+use App\Mail\MovieCreated;
+use Illuminate\Support\Facades\Mail;
 
 class MovieController extends Controller
 {
@@ -82,8 +84,8 @@ class MovieController extends Controller
             ]);
         }
 
-        $movie['image'] = $fileName;
-        event(new NewMovieIsCreatedEvent($movie));
+        event(new NewMovieIsCreatedEvent($movie, $fileName));
+        // Mail::to('test@test.com')->queue(new MovieCreated($event->movie));
 
     }
 

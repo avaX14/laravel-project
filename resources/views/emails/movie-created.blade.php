@@ -8,7 +8,7 @@
 <body>
     <h3>A new movie is added to the system.</h3>
     <img src="{{$movie->image_url}}" alt="">
-    <img src="{{'http://localhost:8000/storage/'.'thumbnail_'.$movie->image}}" alt="">
+    <img src="{{'http://localhost:8000/storage/'.'thumbnail_'.$fileName}}" alt="">
     <h4>Title:</h4>
     <label>{{$movie->title}}</label>
     <h4>Description:</h4>
