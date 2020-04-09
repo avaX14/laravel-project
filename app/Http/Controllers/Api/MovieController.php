@@ -10,12 +10,13 @@ use App\LikeDislike;
 use App\WatchList;
 use App\User;
 use App\MovieImage;
-use App\Mail\MovieCreated;
-use Illuminate\Support\Facades\Mail;
+use App\Events\NewMovieIsCreatedEvent;
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\CreateMovieRequest;
+use App\Mail\MovieCreated;
+use Illuminate\Support\Facades\Mail;
 
 class MovieController extends Controller
 {
@@ -83,8 +84,8 @@ class MovieController extends Controller
             ]);
         }
 
-        $movie['image'] = $fileName;
-        Mail::to('test@test.com')->send(new MovieCreated($movie));
+        event(new NewMovieIsCreatedEvent($movie, $fileName));
+        // Mail::to('test@test.com')->queue(new MovieCreated($event->movie));
 
     }
 
