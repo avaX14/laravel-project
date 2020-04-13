@@ -37,24 +37,15 @@ class MovieController extends Controller
 
         if($title!="false"){
             $movies =  Movie::with('likes')->with('images')->with('genres')->where('title', 'like', "%{$title}%")->paginate(5);
-            $movies->each(function ($item, $key) {
-                $this->generateLikes($item);
-            });
-            
             return $movies;
         }
         else if($genre != "false"){  
             $genres = Genre::with('movies')->with('images')->where('name', '=', $genre)->first();
             $movies = $genres->movies()->paginate(5);
-
             return $movies;
 
         }
         $movies =  Movie::with('likes', 'images')->with('genres')->paginate(5);
-        $movies->each(function ($item, $key) {
-            $this->generateLikes($item);
-            
-        });
         
         return $movies;
 
@@ -103,7 +94,6 @@ class MovieController extends Controller
         $movie = Movie::with('genres', 'images')->find($id);
         $movie->increment('visited');
         $movie['watched'] = false;
-        $this->generateLikes($movie);
         
         return $movie;
     }
@@ -152,7 +142,6 @@ class MovieController extends Controller
         $userMovies =  User::with('movies')->where('id', '=', $userId)->first();
         $userMovies->movies->each(function ($item, $key) {
                 $item['watched'] = $item->pivot->watched;
-                $this->generateLikes($item);
         });
 
         return $userMovies;
