@@ -4,19 +4,24 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateMovieRequest;
+use App\Mail\MovieCreated;
+
 use App\Movie;
 use App\Genre;
 use App\LikeDislike;
 use App\WatchList;
 use App\User;
 use App\MovieImage;
+
 use App\Events\NewMovieIsCreatedEvent;
+use App\Events\LikeDislikeEvent;
+
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Route;
-use App\Http\Requests\CreateMovieRequest;
-use App\Mail\MovieCreated;
 use Illuminate\Support\Facades\Mail;
+
 
 class MovieController extends Controller
 {
@@ -85,8 +90,6 @@ class MovieController extends Controller
         }
 
         event(new NewMovieIsCreatedEvent($movie, $fileName));
-        // Mail::to('test@test.com')->queue(new MovieCreated($event->movie));
-
     }
 
     /**
@@ -140,17 +143,8 @@ class MovieController extends Controller
         );
 
         $movieToUpdate =  Movie::with('likes')->find($movieId);
-        return $this->generateLikes($movieToUpdate);
 
-    }
-
-    public function generateLikes($movieToUpdate){
-        $allLikes = count($movieToUpdate->likes->where('liked', 1));
-        $allDislikes = count($movieToUpdate->likes->where('disliked', 1));
-        $movieToUpdate['likesNumber'] = $allLikes;
-        $movieToUpdate['dislikesNumber'] = $allDislikes;
-        return $movieToUpdate;
-
+        event(new LikeDislikeEvent($movieToUpdate));
     }
 
     public function watchList(Request $request){
