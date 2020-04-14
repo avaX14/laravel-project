@@ -125,8 +125,10 @@ class MovieController extends Controller
     public function likeDislikeMovie(Request $request, $movieId){
         
         $like = $request['like'];
-        $userId = $request->user()->id;
+        // $userId = $request->user()->id;
 
+        $userId= Auth::id();
+        
         $likeDislike = LikeDislike::updateOrCreate(
             ['user_id' => $userId, 'movie_id' => $movieId],
             ['liked' => ($like==1), 'disliked'=> ($like==0) ]
