@@ -4,19 +4,24 @@ namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\CreateMovieRequest;
+use App\Mail\MovieCreated;
+
 use App\Movie;
 use App\Genre;
 use App\LikeDislike;
 use App\WatchList;
 use App\User;
 use App\MovieImage;
+
 use App\Events\NewMovieIsCreatedEvent;
+use App\Events\LikeDislikeEvent;
+
 use Illuminate\Support\Facades\Auth;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Route;
-use App\Http\Requests\CreateMovieRequest;
-use App\Mail\MovieCreated;
 use Illuminate\Support\Facades\Mail;
+
 
 class MovieController extends Controller
 {
@@ -32,24 +37,15 @@ class MovieController extends Controller
 
         if($title!="false"){
             $movies =  Movie::with('likes')->with('images')->with('genres')->where('title', 'like', "%{$title}%")->paginate(5);
-            $movies->each(function ($item, $key) {
-                $this->generateLikes($item);
-            });
-            
             return $movies;
         }
         else if($genre != "false"){  
             $genres = Genre::with('movies')->with('images')->where('name', '=', $genre)->first();
             $movies = $genres->movies()->paginate(5);
-
             return $movies;
 
         }
         $movies =  Movie::with('likes', 'images')->with('genres')->paginate(5);
-        $movies->each(function ($item, $key) {
-            $this->generateLikes($item);
-            
-        });
         
         return $movies;
 
@@ -85,8 +81,6 @@ class MovieController extends Controller
         }
 
         event(new NewMovieIsCreatedEvent($movie, $fileName));
-        // Mail::to('test@test.com')->queue(new MovieCreated($event->movie));
-
     }
 
     /**
@@ -100,7 +94,6 @@ class MovieController extends Controller
         $movie = Movie::with('genres', 'images')->find($id);
         $movie->increment('visited');
         $movie['watched'] = false;
-        $this->generateLikes($movie);
         
         return $movie;
     }
@@ -140,17 +133,8 @@ class MovieController extends Controller
         );
 
         $movieToUpdate =  Movie::with('likes')->find($movieId);
-        return $this->generateLikes($movieToUpdate);
 
-    }
-
-    public function generateLikes($movieToUpdate){
-        $allLikes = count($movieToUpdate->likes->where('liked', 1));
-        $allDislikes = count($movieToUpdate->likes->where('disliked', 1));
-        $movieToUpdate['likesNumber'] = $allLikes;
-        $movieToUpdate['dislikesNumber'] = $allDislikes;
-        return $movieToUpdate;
-
+        event(new LikeDislikeEvent($movieToUpdate));
     }
 
     public function watchList(Request $request){
@@ -158,7 +142,6 @@ class MovieController extends Controller
         $userMovies =  User::with('movies')->where('id', '=', $userId)->first();
         $userMovies->movies->each(function ($item, $key) {
                 $item['watched'] = $item->pivot->watched;
-                $this->generateLikes($item);
         });
 
         return $userMovies;

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Comment;
+use App\Events\NewComment;
 
 class CommentController extends Controller
 {
@@ -46,6 +47,8 @@ class CommentController extends Controller
         $comment->text = $request->text;
         $comment->user_name= $userName;
         $comment->save();
+
+        event(new NewComment($comment));
 
         return $comment;
     }
