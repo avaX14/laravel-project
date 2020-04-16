@@ -91,9 +91,19 @@ class MovieController extends Controller
      */
     public function show($id)
     {
-        $movie = Movie::with('genres', 'images')->find($id);
+        $movie = Movie::with('genres', 'images','likes')->find($id);
         $movie->increment('visited');
         $movie['watched'] = false;
+
+        $movie = $this->checkIfMovieIsLiked($movie);
+
+        // $movie->likes->each(function ($item, $key) use($userId, $movie) {
+        //     if($item->user_id == $userId){
+        //         $movie['liked'] = $item->liked;
+        //         $movie['disliked'] = $item->disliked;
+        //     }
+        // });
+
         
         return $movie;
     }
@@ -125,16 +135,22 @@ class MovieController extends Controller
     public function likeDislikeMovie(Request $request, $movieId){
         
         $like = $request['like'];
-        $userId = $request->user()->id;
+        // $userId = $request->user()->id;
 
+        $userId= Auth::id();
+        
         $likeDislike = LikeDislike::updateOrCreate(
             ['user_id' => $userId, 'movie_id' => $movieId],
             ['liked' => ($like==1), 'disliked'=> ($like==0) ]
         );
 
-        $movieToUpdate =  Movie::with('likes')->find($movieId);
+        $movie =  Movie::with('likes')->find($movieId);
 
-        event(new LikeDislikeEvent($movieToUpdate));
+        $movie = $this->checkIfMovieIsLiked($movie);
+
+       
+
+        event(new LikeDislikeEvent($movie));
     }
 
     public function watchList(Request $request){
@@ -200,5 +216,17 @@ class MovieController extends Controller
 
             return $filename;
         }
+    }
+
+    public function checkIfMovieIsLiked($movie){
+        $userId = Auth::id();
+        $movie->likes->each(function ($item, $key) use($userId, $movie) {
+            if($item->user_id == $userId){
+                $movie['liked'] = $item->liked;
+                $movie['disliked'] = $item->disliked;
+            }
+        });
+
+        return $movie;
     }
 }
