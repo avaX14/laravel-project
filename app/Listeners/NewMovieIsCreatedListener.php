@@ -22,6 +22,14 @@ class NewMovieIsCreatedListener implements ShouldQueue
      */
     public function handle(NewMovieIsCreatedEvent $event)
     {
-        Mail::to('test@test.com')->send(new MovieCreated($event->movie, $event->fileName));
+        $counter = 0;
+
+        dispatch(function() use($event){
+            if($counter < 1){
+                throw new \Exception("Test Exception");
+                $counter++;
+            }
+            Mail::to('test@test.com')->send(new MovieCreated($event->movie, $event->fileName));
+        });
     }
 }

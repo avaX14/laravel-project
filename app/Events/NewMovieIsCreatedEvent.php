@@ -9,6 +9,8 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use App\Mail\MovieCreated;
+use Illuminate\Support\Facades\Mail;
 
 class NewMovieIsCreatedEvent
 {
@@ -29,5 +31,13 @@ class NewMovieIsCreatedEvent
         $this->fileName = $fileName;
 
     }
+
+    // public function handle()
+    // {
+    //     // Mail::to('test@test.com')->send(new MovieCreated($this->movie, $this->fileName));
+    //     Mail::raw('Text', function ($message){
+    //         $message->to('contact@contact.com');
+    //     });
+    // }
 
 }

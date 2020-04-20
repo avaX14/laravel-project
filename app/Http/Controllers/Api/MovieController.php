@@ -22,6 +22,9 @@ use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Mail;
 
+use Illuminate\Queue\Events\JobFailed;
+use Exception;
+
 
 class MovieController extends Controller
 {
@@ -63,24 +66,36 @@ class MovieController extends Controller
         $movie =  Movie::create([
             'title' => request('title'),
             'image_url' => request('imageURL'),
-            'description' => request('description')
+            'description' => request('description') 
         ]);
 
         $fileName = $request['fileName'];
+        $counter = 0;
+        
+        // if($counter < 1){
+        //     \Log::info("USAO 1");
+        //     $this->dispatch(new NewMovieIsCreatedEvent($movie, $fileName));
 
-        if($fileName){
+        //     $counter = $counter + 1;
+        // }else{
+            \Log::info("USAO 2");
     
-            $thumbnail = 'storage/'.'thumbnail_'.$fileName;
-            $full_size = 'storage/'.'full_size_'.$fileName;
-    
-            $movieImage = MovieImage::create([
-                'movie_id' => $movie->id,
-                'thumbnail' => $thumbnail,
-                'full_size' => $full_size
-            ]);
-        }
+            if($fileName){
+        
+                $thumbnail = 'storage/'.'thumbnail_'.$fileName;
+                $full_size = 'storage/'.'full_size_'.$fileName;
+        
+                $movieImage = MovieImage::create([
+                    'movie_id' => $movie->id,
+                    'thumbnail' => $thumbnail,
+                    'full_size' => $full_size
+                ]);
+            }
 
-        event(new NewMovieIsCreatedEvent($movie, $fileName));
+            event(new NewMovieIsCreatedEvent($movie, $fileName));
+        // }
+
+        // event(new NewMovieIsCreatedEvent($movie, $fileName));
     }
 
     /**
