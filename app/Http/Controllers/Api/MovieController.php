@@ -72,30 +72,20 @@ class MovieController extends Controller
         $fileName = $request['fileName'];
         $counter = 0;
         
-        // if($counter < 1){
-        //     \Log::info("USAO 1");
-        //     $this->dispatch(new NewMovieIsCreatedEvent($movie, $fileName));
-
-        //     $counter = $counter + 1;
-        // }else{
-            \Log::info("USAO 2");
+        if($fileName){
     
-            if($fileName){
-        
-                $thumbnail = 'storage/'.'thumbnail_'.$fileName;
-                $full_size = 'storage/'.'full_size_'.$fileName;
-        
-                $movieImage = MovieImage::create([
-                    'movie_id' => $movie->id,
-                    'thumbnail' => $thumbnail,
-                    'full_size' => $full_size
-                ]);
-            }
+            $thumbnail = 'storage/'.'thumbnail_'.$fileName;
+            $full_size = 'storage/'.'full_size_'.$fileName;
+    
+            $movieImage = MovieImage::create([
+                'movie_id' => $movie->id,
+                'thumbnail' => $thumbnail,
+                'full_size' => $full_size
+            ]);
+        }
 
-            event(new NewMovieIsCreatedEvent($movie, $fileName));
-        // }
+        event(new NewMovieIsCreatedEvent($movie, $fileName));
 
-        // event(new NewMovieIsCreatedEvent($movie, $fileName));
     }
 
     /**
